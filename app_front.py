@@ -35,7 +35,7 @@ with st.sidebar:
         if st.button('Войти ⚷', use_container_width=True, key='btn_login'):
             if user_name:
                 response = requests.get(
-                    url=f'http://backend:8000/users/{user_name}/stats',
+                    url=f'http://194.87.74.105:8000/users/{user_name}/stats',
                     params={'date_query': str(date.today())}
                 )
                 if response.status_code == 200:
@@ -54,7 +54,7 @@ with st.sidebar:
                     "name": user_name,
                     "daily_target": target_calories
                 }
-                response = requests.post(url='http://backend:8000/users', json=payload)
+                response = requests.post(url='http://194.87.74.105:8000/users', json=payload)
                 if response.status_code in [200, 201]:
                     st.session_state['user_name'] = user_name
                     st.success(f"Профиль '{user_name}' создан (*^ω^)")
@@ -85,7 +85,7 @@ with tab1:
     current_user = st.session_state.get('user_name', '')
 
     if current_user:
-        response = requests.get(url=f'http://backend:8000/users/{user_name}/stats', params={'date_query': str(date_query)})
+        response = requests.get(url=f'http://194.87.74.105:8000/users/{user_name}/stats', params={'date_query': str(date_query)})
 
         if response.status_code in [200, 201]:
             data = response.json()
@@ -134,7 +134,7 @@ with tab3:
                 "fats": fats,
                 "carbs": carbs
             }
-            response = requests.post(url='http://backend:8000/products', json=payload)
+            response = requests.post(url='http://194.87.74.105:8000/products', json=payload)
             if response.status_code in [201, 200]:
                 st.success(f"Продукт '{product_name}' успешно сохранен в общую базу (◕‿◕)♡")
             else:
@@ -142,7 +142,7 @@ with tab3:
 
 
 with tab2:
-    prod_response = requests.get(url='http://backend:8000/products')
+    prod_response = requests.get(url='http://194.87.74.105:8000/products')
     prod_list = prod_response.json()
 
     if prod_list:
@@ -164,7 +164,7 @@ with tab2:
                     "date": str(meal_date)
                 }
 
-                response = requests.post(url='http://backend:8000/meals', json=payload)
+                response = requests.post(url='http://194.87.74.105:8000/meals', json=payload)
                 if response.status_code in [200, 201]:
                     st.success("Прием пищи записан в Ваш дневник! 𓎩")
                 else:
@@ -178,7 +178,7 @@ with tab4:
 
     recipe_name = st.text_input("Название готового блюда", key="recipe_name_input")
 
-    prod_response = requests.get(url='http://backend:8000/products')
+    prod_response = requests.get(url='http://194.87.74.105:8000/products')
     prod_list = prod_response.json()
 
     if prod_list:
@@ -256,7 +256,7 @@ with tab4:
                     "fats": final_fats,
                     "carbs": final_carbs
                 }
-                response = requests.post(url='http://backend:8000/products', json=payload)
+                response = requests.post(url='http://194.87.74.105:8000/products', json=payload)
                 if response.status_code in [201, 200]:
                     st.success("Блюдо занесено (´｡•ᵕ•｡`) ♡")
                     st.session_state['recipe_ingredients'] = []
