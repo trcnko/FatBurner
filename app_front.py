@@ -6,6 +6,7 @@ from styles import CUSTOM_CSS
 
 BACKEND_URL = 'http://194.87.74.105:8000'
 # BACKEND_URL = 'http://localhost:8000'
+# BACKEND_URL = 'http://backend:8000'
 
 st.markdown(CUSTOM_CSS,
     unsafe_allow_html=True
@@ -144,7 +145,7 @@ with tab1:
                             st.rerun()
 
             else:
-                st.error('В этот день ты еще ничего не кушала (◕‿◕)♡')
+                st.error('В этот день Вы еще ничего не кушали (◕‿◕)♡')
         else:
             st.error("Пользователь не найден на бэкенде!")
     else:
@@ -171,7 +172,7 @@ with tab3:
                 "fats": fats,
                 "carbs": carbs
             }
-            response = requests.post(url='{BACKEND_URL}/products', json=payload)
+            response = requests.post(url=f'{BACKEND_URL}/products', json=payload)
             if response.status_code in [201, 200]:
                 st.success(f"Продукт '{product_name}' успешно сохранен в общую базу (◕‿◕)♡")
             else:
@@ -179,7 +180,7 @@ with tab3:
 
 
 with tab2:
-    prod_response = requests.get(url='{BACKEND_URL}/products')
+    prod_response = requests.get(url=f'{BACKEND_URL}/products')
     prod_list = prod_response.json()
 
     if prod_list:
@@ -201,10 +202,11 @@ with tab2:
                     "date": str(meal_date)
                 }
 
-                response = requests.post(url='{BACKEND_URL}/meals', json=payload)
+                response = requests.post(url=f'{BACKEND_URL}/meals', json=payload)
                 if response.status_code in [200, 201]:
                     st.success("Прием пищи записан в Ваш дневник! 𓎩")
                 else:
+                    # st.error(f"статус-код: {response.status_code}")
                     st.error(f"(←_←) Войдите в профиль")
     else:
         st.write('В базе данных пока нет ни одного продукта! =(')
@@ -215,7 +217,7 @@ with tab4:
 
     recipe_name = st.text_input("Название готового блюда", key="recipe_name_input")
 
-    prod_response = requests.get(url='{BACKEND_URL}/products')
+    prod_response = requests.get(url=f'{BACKEND_URL}/products')
     prod_list = prod_response.json()
 
     if prod_list:
@@ -293,7 +295,7 @@ with tab4:
                     "fats": final_fats,
                     "carbs": final_carbs
                 }
-                response = requests.post(url='{BACKEND_URL}/products', json=payload)
+                response = requests.post(url=f'{BACKEND_URL}/products', json=payload)
                 if response.status_code in [201, 200]:
                     st.success("Блюдо занесено (´｡•ᵕ•｡`) ♡")
                     st.session_state['recipe_ingredients'] = []

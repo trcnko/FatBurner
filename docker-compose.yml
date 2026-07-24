@@ -12,7 +12,9 @@ services:
     restart: always
 
   backend:
-    image: trcnko/fatburner-backend:latest
+    build:
+      context: .
+      dockerfile: dockerfile_backend
     environment:
       DB_HOST: db
       DB_PORT: 5432
@@ -26,7 +28,9 @@ services:
     restart: always
 
   frontend:
-    image: trcnko/fatburner-frontend:latest
+    build:
+      context: .
+      dockerfile: dockerfile_frontend
     ports:
       - '8501:8501'
     depends_on:
