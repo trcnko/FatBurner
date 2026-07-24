@@ -133,7 +133,6 @@ with tab1:
                             del_resp = requests.delete(f"{BACKEND_URL}/meals/{meal_id_to_delete}")
 
                             if del_resp.status_code == 200:
-                                st.success("Блюдо успешно удалено ＼(￣▽￣)／")
                                 st.session_state.show_delete_menu = False
                                 st.rerun()
                             else:
@@ -205,6 +204,7 @@ with tab2:
                 response = requests.post(url=f'{BACKEND_URL}/meals', json=payload)
                 if response.status_code in [200, 201]:
                     st.success("Прием пищи записан в Ваш дневник! 𓎩")
+                    st.rerun()
                 else:
                     # st.error(f"статус-код: {response.status_code}")
                     st.error(f"(←_←) Войдите в профиль")

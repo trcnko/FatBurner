@@ -90,8 +90,13 @@ def create_meal(meal_in: MealCreate, db: Session = Depends(get_db)):
     if not product:
         raise HTTPException(status_code=404, detail="Продукт не найден")
 
-    db_meal = Meals(user_id=user.user_id,
-                    **meal_in.model_dump())
+    db_meal = Meals(
+        user_id=user.user_id,
+        product_id=meal_in.product_id,
+        grams=meal_in.grams,
+        date=meal_in.date
+    )
+
     db.add(db_meal)
     db.commit()
     db.refresh(db_meal)
