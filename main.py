@@ -28,6 +28,7 @@ def calculate_nutrition(meals, daily_target):
         meal_carbs = round(meal.product.carbs * meal.grams * 0.01, 1)
 
         history_list.append({
+            'id': meal.meal_id,
             'Продукт': meal.product.name,
             'Калории, ккал': meal_calories,
             'Белки, г': meal_proteins,
