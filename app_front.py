@@ -113,7 +113,7 @@ with tab1:
                 if 'show_delete_menu' not in st.session_state:
                     st.session_state.show_delete_menu = False
 
-                if st.button ('Удалить блюдо из дневника 🗑️'):
+                if st.button('Удалить блюдо из дневника 🗑️'):
                     st.session_state.show_delete_menu = True
                     st.rerun()
 
