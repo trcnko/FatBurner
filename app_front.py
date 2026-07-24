@@ -122,7 +122,7 @@ with tab1:
                     options = {}
                     for m in data['meals_history']:
                         label = f"{m['Продукт']} ({m['Калории, ккал']} ккал)"
-                        options[label] = m['meal_id']
+                        options[label] = m['id']
 
                     selected_label = st.selectbox("Выберите, какое блюдо нужно стереть (゜_゜;)", options=list(options.keys()))
                     col_del, col_can = st.columns(2)
