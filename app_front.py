@@ -4,6 +4,9 @@ import streamlit as st
 
 from styles import CUSTOM_CSS
 
+BACKEND_URL = 'http://194.87.74.105:8000'
+# BACKEND_URL = 'http://localhost:8000'
+
 st.markdown(CUSTOM_CSS,
     unsafe_allow_html=True
 )
@@ -35,7 +38,7 @@ with st.sidebar:
         if st.button('Войти ⚷', use_container_width=True, key='btn_login'):
             if user_name:
                 response = requests.get(
-                    url=f'http://194.87.74.105:8000/users/{user_name}/stats',
+                    url=f'{BACKEND_URL}/users/{user_name}/stats',
                     params={'date_query': str(date.today())}
                 )
                 if response.status_code == 200:
@@ -54,7 +57,7 @@ with st.sidebar:
                     "name": user_name,
                     "daily_target": target_calories
                 }
-                response = requests.post(url='http://194.87.74.105:8000/users', json=payload)
+                response = requests.post(url=f'{BACKEND_URL}/users', json=payload)
                 if response.status_code in [200, 201]:
                     st.session_state['user_name'] = user_name
                     st.success(f"Профиль '{user_name}' создан (*^ω^)")
@@ -85,7 +88,7 @@ with tab1:
     current_user = st.session_state.get('user_name', '')
 
     if current_user:
-        response = requests.get(url=f'http://194.87.74.105:8000/users/{user_name}/stats', params={'date_query': str(date_query)})
+        response = requests.get(url=f'{BACKEND_URL}/users/{current_user}/stats', params={'date_query': str(date_query)})
 
         if response.status_code in [200, 201]:
             data = response.json()
@@ -106,6 +109,40 @@ with tab1:
             st.write('#### История питания за день: ')
             if data['meals_history']:
                 st.dataframe(data['meals_history'], use_container_width=True)
+
+                if 'show_delete_menu' not in st.session_state:
+                    st.session_state.show_delete_menu = False
+
+                if st.button ('Удалить блюдо из дневника 🗑️'):
+                    st.session_state.show_delete_menu = True
+                    st.rerun()
+
+                if st.session_state.show_delete_menu:
+                    options = {}
+                    for m in data['meals_history']:
+                        label = f"{m['Продукт']} ({m['Калории, ккал']} ккал)"
+                        options[label] = m['meal_id']
+
+                    selected_label = st.selectbox("Выберите, какое блюдо нужно стереть (゜_゜;)", options=list(options.keys()))
+                    col_del, col_can = st.columns(2)
+
+                    with col_del:
+                        if st.button("Стереть", type="primary"):
+                            meal_id_to_delete = options[selected_label]
+                            del_resp = requests.delete(f"{BACKEND_URL}/meals/{meal_id_to_delete}")
+
+                            if del_resp.status_code == 200:
+                                st.success("Блюдо успешно удалено ＼(￣▽￣)／")
+                                st.session_state.show_delete_menu = False
+                                st.rerun()
+                            else:
+                                st.error("(╥﹏╥) Не удалось удалить блюдо на сервере")
+
+                    with col_can:
+                        if st.button("Отмена (〃￣ω￣)"):
+                            st.session_state.show_delete_menu = False
+                            st.rerun()
+
             else:
                 st.error('В этот день ты еще ничего не кушала (◕‿◕)♡')
         else:
@@ -134,7 +171,7 @@ with tab3:
                 "fats": fats,
                 "carbs": carbs
             }
-            response = requests.post(url='http://194.87.74.105:8000/products', json=payload)
+            response = requests.post(url='{BACKEND_URL}/products', json=payload)
             if response.status_code in [201, 200]:
                 st.success(f"Продукт '{product_name}' успешно сохранен в общую базу (◕‿◕)♡")
             else:
@@ -142,7 +179,7 @@ with tab3:
 
 
 with tab2:
-    prod_response = requests.get(url='http://194.87.74.105:8000/products')
+    prod_response = requests.get(url='{BACKEND_URL}/products')
     prod_list = prod_response.json()
 
     if prod_list:
@@ -164,7 +201,7 @@ with tab2:
                     "date": str(meal_date)
                 }
 
-                response = requests.post(url='http://194.87.74.105:8000/meals', json=payload)
+                response = requests.post(url='{BACKEND_URL}/meals', json=payload)
                 if response.status_code in [200, 201]:
                     st.success("Прием пищи записан в Ваш дневник! 𓎩")
                 else:
@@ -178,7 +215,7 @@ with tab4:
 
     recipe_name = st.text_input("Название готового блюда", key="recipe_name_input")
 
-    prod_response = requests.get(url='http://194.87.74.105:8000/products')
+    prod_response = requests.get(url='{BACKEND_URL}/products')
     prod_list = prod_response.json()
 
     if prod_list:
@@ -256,7 +293,7 @@ with tab4:
                     "fats": final_fats,
                     "carbs": final_carbs
                 }
-                response = requests.post(url='http://194.87.74.105:8000/products', json=payload)
+                response = requests.post(url='{BACKEND_URL}/products', json=payload)
                 if response.status_code in [201, 200]:
                     st.success("Блюдо занесено (´｡•ᵕ•｡`) ♡")
                     st.session_state['recipe_ingredients'] = []
