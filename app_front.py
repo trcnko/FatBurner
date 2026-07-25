@@ -49,6 +49,7 @@ with st.sidebar:
                 if response.status_code == 200:
                     st.session_state['user_name'] = user_name
                     st.success('Добро пожаловать (*^ω^)')
+                    time.sleep(2)
                     st.rerun()
                 else:
                     st.error('Неверный логин или пароль (｡•́︿•̀｡)')
@@ -67,14 +68,10 @@ with st.sidebar:
                 if response.status_code in [200, 201]:
                     st.session_state['user_name'] = user_name
                     st.success(f"Профиль '{user_name}' создан (*^ω^)")
+                    time.sleep(2)
                     st.rerun()
                 elif response.status_code == 400:
                     st.error("Этот никнейм уже занят (｡•́︿•̀｡)")
-                else:
-                    error_detail = response.json().get('detail', 'Неизвестная ошибка')
-                    if isinstance(error_detail, list):
-                        error_detail = error_detail[0].get('msg', 'Ошибка валидации')
-                    st.error(f"Ошибка: {error_detail} (｡•́︿•̀｡)")
             else:
                 st.warning("Введите никнейм и пароль Σ(°ロ°)!!!")
 
