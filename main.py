@@ -2,10 +2,13 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Products, Users, Meals
-from schemas import ProductCreate, Product, UserCreate, Meal, MealCreate
+from schemas import ProductCreate, Product, UserCreate, Meal, MealCreate, UserLogin
 from datetime import date
+from passlib.context import CryptContext
 
 app = FastAPI()
+
+pwd_context = CryptContext(schemes=['bcrypt'])
 
 def calculate_nutrition(meals, daily_target):
     cpfc = {}
@@ -73,11 +76,22 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)):
     user = db.query(Users).filter(Users.name == user_in.name).first()
     if user:
         raise HTTPException(status_code=400, detail='Этот ник уже занят')
-    db_user = Users(**user_in.model_dump())
+
+    data = user_in.model_dump()
+    data['password_hash'] = pwd_context.hash(data.pop('password'))
+
+    db_user = Users(**data)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
+
+@app.post('/login')
+def login_user(user_in: UserLogin, db: Session = Depends(get_db)):
+    user = db.query(Users).filter(Users.name == user_in.name).first()
+    if not user or not pwd_context.verify(user_in.password, user.password_hash):
+        raise HTTPException(status_code=401, detail='Неверный логин или пароль')
+    return {'status': 'success', 'user_name': user.name}
 
 
 @app.post("/meals", response_model=Meal)

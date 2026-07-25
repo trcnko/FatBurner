@@ -8,6 +8,7 @@ class Users(Base):
     user_id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
     daily_target: Mapped[int]
+    password_hash: Mapped[str]
 
 class Products(Base):
     __tablename__ = 'products'

@@ -1,6 +1,7 @@
 import requests
 from datetime import date
 import streamlit as st
+import time
 
 from styles import CUSTOM_CSS
 
@@ -33,53 +34,61 @@ st.markdown(
 with st.sidebar:
     st.title('Управление профилем (^-^*)/')
     user_name = st.text_input('Введите свой никнейм', key='input_user_name')
+    user_password = st.text_input('Введите пароль', type='password', key='input_user_password')
+
     is_new_user = st.checkbox('(•⩊•) Я новый пользователь (Регистрация)', key='reg_checkbox')
 
     if not is_new_user:
         if st.button('Войти ⚷', use_container_width=True, key='btn_login'):
-            if user_name:
-                response = requests.get(
-                    url=f'{BACKEND_URL}/users/{user_name}/stats',
-                    params={'date_query': str(date.today())}
+            if user_name and user_password:
+                payload = {'name': user_name, 'password': user_password}
+                response = requests.post(
+                    url=f'{BACKEND_URL}/login',
+                    json=payload
                 )
                 if response.status_code == 200:
                     st.session_state['user_name'] = user_name
                     st.success('Добро пожаловать (*^ω^)')
+                    st.rerun()
                 else:
-                    st.session_state['user_name'] = ''
-                    st.error('Никнейм не найден (｡•́︿•̀｡)')
+                    st.error('Неверный логин или пароль (｡•́︿•̀｡)')
             else:
-                st.warning('Введите никнейм Σ(°ロ°)!!!')
+                st.warning('Введите никнейм и пароль Σ(°ロ°)!!!')
     else:
         target_calories = st.number_input('Цель калорий на день ૮˶ᵔᵕᵔ˶ა', key='sidebar_target', min_value=0, value=0, format="%d")
         if st.button('Создать профиль ✍', use_container_width=True, key='btn_reg'):
-            if user_name:
+            if user_name and user_password:
                 payload = {
                     "name": user_name,
-                    "daily_target": target_calories
+                    "daily_target": target_calories,
+                    'password': user_password
                 }
                 response = requests.post(url=f'{BACKEND_URL}/users', json=payload)
                 if response.status_code in [200, 201]:
                     st.session_state['user_name'] = user_name
                     st.success(f"Профиль '{user_name}' создан (*^ω^)")
+                    st.rerun()
                 elif response.status_code == 400:
                     st.error("Этот никнейм уже занят (｡•́︿•̀｡)")
             else:
-                st.warning("Введите никнейм для регистрации Σ(°ロ°)!!!")
+                st.warning("Введите никнейм и пароль Σ(°ロ°)!!!")
 
     st.markdown('---')
     user_name1 = st.session_state.get('user_name', '')
     if user_name1:
         st.markdown(f"**Авторизован:** `{user_name1}`")
+        if st.button('Выйти 🚪', use_container_width=True):
+            st.session_state['user_name'] = ''
+            st.rerun()
     else:
         st.markdown("**Вход не выполнен**")
 
 
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📝 Дневник ",
-    "🍝 Записать прием пищи ",
-    "🍕 Добавить новый продукт ",
-    '🥘 Добавить своё блюдо '
+    "📝 Дневник",
+    "🍝 Записать прием пищи",
+    "🍕 Добавить новый продукт",
+    '🥘 Добавить своё блюдо'
 ])
 
 
@@ -204,6 +213,7 @@ with tab2:
                 response = requests.post(url=f'{BACKEND_URL}/meals', json=payload)
                 if response.status_code in [200, 201]:
                     st.success("Прием пищи записан в Ваш дневник! 𓎩")
+                    time.sleep(2)
                     st.rerun()
                 else:
                     # st.error(f"статус-код: {response.status_code}")

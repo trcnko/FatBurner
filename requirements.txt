@@ -3,6 +3,7 @@ annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.14.1
 attrs==26.1.0
+bcrypt==4.0.1
 blinker==1.9.0
 cachetools==7.1.4
 certifi==2026.6.17
@@ -26,6 +27,7 @@ narwhals==2.23.0
 numpy==2.5.1
 packaging==26.2
 pandas==3.0.3
+passlib==1.7.4
 pillow==12.3.0
 pluggy==1.6.0
 protobuf==7.35.1

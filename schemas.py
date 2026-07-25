@@ -11,6 +11,11 @@ class ProductCreate(BaseModel):
 class UserCreate(BaseModel):
     name: str = Field(min_length=1)
     daily_target: int = Field(ge=0)
+    password: str = Field(min_length=8)
+
+class UserLogin(BaseModel):
+    name: str
+    password: str
 
 class Product(BaseModel):
     product_id: int
@@ -37,5 +42,4 @@ class Meal(BaseModel):
     product_id: int
     grams: float
     date: date
-
     model_config = {"from_attributes": True}
