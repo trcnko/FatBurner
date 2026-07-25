@@ -70,6 +70,11 @@ with st.sidebar:
                     st.rerun()
                 elif response.status_code == 400:
                     st.error("Этот никнейм уже занят (｡•́︿•̀｡)")
+                else:
+                    error_detail = response.json().get('detail', 'Неизвестная ошибка')
+                    if isinstance(error_detail, list):
+                        error_detail = error_detail[0].get('msg', 'Ошибка валидации')
+                    st.error(f"Ошибка: {error_detail} (｡•́︿•̀｡)")
             else:
                 st.warning("Введите никнейм и пароль Σ(°ロ°)!!!")
 
