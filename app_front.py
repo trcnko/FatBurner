@@ -1,7 +1,8 @@
 import requests
-from datetime import date
+from datetime import date, datetime, timedelta
 import streamlit as st
 import time
+import extra_streamlit_components as stx
 
 from styles import CUSTOM_CSS
 
@@ -33,6 +34,17 @@ st.markdown(
 
 with st.sidebar:
     st.title('Управление профилем (^-^*)/')
+
+    cookie_manager = stx.CookieManager()
+
+    saved_user = cookie_manager.get(cookie='user_name')
+
+    if saved_user is None:
+        saved_user = ''
+
+    if saved_user and not st.session_state.get('user_name'):
+        st.session_state['user_name'] = saved_user
+
     user_name = st.text_input('Введите свой никнейм', key='input_user_name')
     user_password = st.text_input('Введите пароль', type='password', key='input_user_password')
 
@@ -48,6 +60,7 @@ with st.sidebar:
                 )
                 if response.status_code == 200:
                     st.session_state['user_name'] = user_name
+                    cookie_manager.set(cookie='user_name', val=user_name, expires_at=datetime.now() + timedelta(days=365))
                     st.success('Добро пожаловать (*^ω^)')
                     time.sleep(2)
                     st.rerun()
@@ -67,11 +80,14 @@ with st.sidebar:
                 response = requests.post(url=f'{BACKEND_URL}/users', json=payload)
                 if response.status_code in [200, 201]:
                     st.session_state['user_name'] = user_name
+                    cookie_manager.set(cookie='user_name', val=user_name, expires_at=datetime.now() + timedelta(days=365))
                     st.success(f"Профиль '{user_name}' создан (*^ω^)")
                     time.sleep(2)
                     st.rerun()
                 elif response.status_code == 400:
                     st.error("Этот никнейм уже занят (｡•́︿•̀｡)")
+                elif response.status_code == 422:
+                    st.error("Пароль должен быть не короче 8 символов (｡•́︿•̀｡)")
             else:
                 st.warning("Введите никнейм и пароль Σ(°ロ°)!!!")
 
@@ -81,6 +97,7 @@ with st.sidebar:
         st.markdown(f"**Авторизован:** `{user_name1}`")
         if st.button('Выйти 🚪', use_container_width=True):
             st.session_state['user_name'] = ''
+            cookie_manager.delete(cookie='user_name')
             st.rerun()
     else:
         st.markdown("**Вход не выполнен**")
