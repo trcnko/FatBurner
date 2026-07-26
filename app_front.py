@@ -137,7 +137,11 @@ with tab1:
             st.write(f"🍗 Белки: {round(data['total_eaten']['Белки'], 1)} г | 🥑 Жиры: {round(data['total_eaten']['Жиры'], 1)} г | 🍌 Углеводы: {round(data['total_eaten']['Углеводы'], 1)} г")
             st.write('#### История питания за день: ')
             if data['meals_history']:
-                st.dataframe(data['meals_history'], use_container_width=True)
+                st.dataframe(
+                    data['meals_history'],
+                    use_container_width=True,
+                    column_order=['Продукт', 'Калории, ккал', 'Белки, г', 'Жиры, г', 'Углеводы, г']
+                )
 
                 if 'show_delete_menu' not in st.session_state:
                     st.session_state.show_delete_menu = False
